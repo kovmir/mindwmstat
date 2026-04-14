@@ -6,6 +6,9 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 
 ```
 0.99 1.23 0.72 | 2026-04-11 Sat 20:05
+      ^                   ^
+      |                   |
+  CPU load            Date & time
 ```
 
 ![screenshot](screenshot.png)
