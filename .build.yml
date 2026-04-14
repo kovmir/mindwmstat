@@ -1,0 +1,7 @@
+image: alpine/edge
+packages:
+  - build-base
+  - pkgconf
+  - xorg-server-dev
+tasks:
+  - build: make -C mindwmstat
