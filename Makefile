@@ -8,7 +8,6 @@ CFLAGS += -pedantic
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wstrict-prototypes
-CFLAGS += -O3
 CFLAGS += -D_DEFAULT_SOURCE
 
 ifneq ($(CONSOLE),)
@@ -24,10 +23,10 @@ endif
 LDFLAGS = $(LIBS)
 
 build:
-	$(CC) ./$(PROJECT).c $(CFLAGS) $(LDFLAGS) -o ./$(PROJECT)
+	$(CC) ./$(PROJECT).c $(CFLAGS) -O2 $(LDFLAGS) -o ./$(PROJECT)
 
 debug:
-	$(CC) ./$(PROJECT).c $(CFLAGS) -g $(LDFLAGS) -o ./$(PROJECT)
+	$(CC) ./$(PROJECT).c $(CFLAGS) -O0 -g $(LDFLAGS) -o ./$(PROJECT)
 
 gdb: debug
 	gdb ./$(PROJECT)
