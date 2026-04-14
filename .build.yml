@@ -4,4 +4,4 @@ packages:
   - pkgconf
   - xorg-server-dev
 tasks:
-  - build: make -C mindwmstat
+  - build: CFLAGS='-Werror' make -C mindwmstat
