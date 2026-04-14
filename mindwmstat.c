@@ -96,22 +96,19 @@ main(void) {
 		if (ok == false)
 			errx(1, "unable to get date/time");
 
+		snprintf(status_buf,
+			STATUS_LEN,
+			"%s%s%s "
 #ifdef STATUS_ANIMATION
-		snprintf(status_buf,
-			STATUS_LEN,
-			"%s%s%s %c",
-			load_buf,
-			status_delim,
-			time_buf,
-			status_frames[curr_frame++]);
-#else
-		snprintf(status_buf,
-			STATUS_LEN,
-			"%s%s%s",
-			load_buf,
-			status_delim,
-			time_buf);
+			"%c"
 #endif /* STATUS_ANIMATION */
+			, load_buf,
+			status_delim,
+			time_buf
+#ifdef STATUS_ANIMATION
+			, status_frames[curr_frame++]
+#endif /* STATUS_ANIMATION */
+			);
 
 		ok = set_status(status_buf);
 		if (ok == false)
