@@ -140,9 +140,9 @@ main(void) {
 
 		snprintf(status_buf,
 			STATUS_LEN,
-			"%d%%%s%s%s%s "
+			"%d%%%s%s%s%s"
 #ifdef STATUS_ANIMATION
-			"%c"
+			" %c"
 #endif /* STATUS_ANIMATION */
 			, ram_usage,
 			status_delim,
