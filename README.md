@@ -7,10 +7,13 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 # PREVIEW
 
 ```
-0.99 1.23 0.72 | 2026-04-11 Sat 20:05
-      ^                   ^
-      |                   |
-  CPU load            Date & time
+ +---- RAM usage
+ |
+ v
+10% | 3.17 0.87 0.32 | 2026-04-14 Tue 14:09
+             ^                   ^
+             |                   |
+         CPU load            Date & time
 ```
 
 ![screenshot](screenshot.png)
