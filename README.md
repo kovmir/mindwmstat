@@ -1,5 +1,7 @@
 # mindwmstat
 
+[![builds.sr.ht status](https://builds.sr.ht/~kovmir/mindwmstat/commits/master/.build.yml.svg)](https://builds.sr.ht/~kovmir/mindwmstat/commits/master/.build.yml?)
+
 Minimal [dwm](https://dwm.suckless.org/) status bar
 
 # PREVIEW
