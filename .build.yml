@@ -3,6 +3,7 @@ packages:
   - build-base
   - pkgconf
   - xorg-server-dev
+  - perl
 tasks:
   - build: CFLAGS='-Werror' make -C mindwmstat
   - test:  CFLAGS='-Werror' make -C mindwmstat test
