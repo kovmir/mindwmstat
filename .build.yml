@@ -5,3 +5,4 @@ packages:
   - xorg-server-dev
 tasks:
   - build: CFLAGS='-Werror' make -C mindwmstat
+  - test:  CFLAGS='-Werror' make -C mindwmstat test
