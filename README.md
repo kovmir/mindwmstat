@@ -23,8 +23,8 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 # INSTALL
 
 ```sh
-git clone https://git.sr.ht/~kovmir/mindwmbar
-cd mindwmbar
+git clone https://git.sr.ht/~kovmir/mindwmstat
+cd mindwmstat
 make
 sudo make install
 ```
@@ -36,7 +36,7 @@ once and terminate.
 # USAGE
 
 ```sh
-mindwmbar # Put 'mindwmbar &' in your '~/.xinitrc'.
+mindwmstat # Put 'mindwmbar &' in your '~/.xinitrc'.
 ```
 
 # DEPENDENCIES
