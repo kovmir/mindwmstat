@@ -44,6 +44,11 @@ get_load(char *buf)
 {
 	double load[3];
 
+	if (buf == NULL) {
+		warnx("get_load buf cannot be NULL");
+		return false;
+	}
+
 	if (getloadavg(load, 3) != 3) {
 		warnx("unable to get cpu load");
 		return false;
@@ -56,6 +61,11 @@ bool
 get_time(char *buf)
 {
 	time_t t = time(NULL);
+
+	if (buf == NULL) {
+		warnx("get_time buf cannot be NULL");
+		return false;
+	}
 
 	struct tm *tm = localtime(&t);
 	if (!tm) {
@@ -133,6 +143,11 @@ get_ram(int *ram_usage)
 	char buf[2048];
 	long mem_total = -1, mem_avail = -1;
 
+	if (ram_usage == NULL) {
+		warnx("ram_usage cannot be NULL");
+		return false;
+	}
+
 	meminfo = fopen("/proc/meminfo", "r");
 	if (meminfo == NULL) {
 		warn("unable to open /proc/meminfo");
@@ -164,6 +179,10 @@ get_ram(int *ram_usage)
 bool
 set_status(char *status)
 {
+	if (status == NULL) {
+		warnx("set_status status cannot be NULL");
+		return false;
+	}
 #ifdef CONSOLE_OUTPUT
 	puts(status);
 #else
