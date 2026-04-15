@@ -29,8 +29,9 @@ make
 sudo make install
 ```
 
-Use `make CONSOLE=1` for console output or `ANIMATION=1` to add status bar
-animation to see whether it updates and how quickly.
+Use `make CONSOLE=1` for console output, or `ANIMATION=1` to add status bar
+animation to see whether it updates and how quickly, or `ONCE=1` to set status
+once and terminate.
 
 # USAGE
 
