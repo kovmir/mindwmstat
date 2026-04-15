@@ -8,6 +8,7 @@ CFLAGS += -pedantic
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wstrict-prototypes
+CFLAGS += -DGIT_DESC=\"$(shell git describe --tags --always --dirty)\"
 CFLAGS += -D_DEFAULT_SOURCE
 
 ifneq ($(CONSOLE),)

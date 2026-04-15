@@ -214,8 +214,8 @@ set_status(char *status)
 	return true;
 }
 
-[[noreturn]] int
-main(void) {
+int
+main(int argc, char *argv[]) {
 	char load_buf[LOAD_LEN];
 	char time_buf[TIME_LEN];
 	char status_buf[STATUS_LEN];
@@ -227,6 +227,12 @@ main(void) {
 	unsigned int curr_frame = 0; /* Current animation frame. */
 #endif /* STATUS_ANIMATION */
 	bool ok;
+
+	(void)argv; /* Suppress -Wunused-parameter. */
+	if (argc > 1) {
+		puts(GIT_DESC); /* Print version. */
+		return 0;
+	}
 
 	if (get_charge(&batt_charge) == false)
 		warnx("no battery was detected");
