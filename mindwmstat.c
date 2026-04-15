@@ -308,7 +308,7 @@ main(int argc, char *argv[]) {
 		ok = set_status(status_buf);
 		if (ok == false)
 			errx(1, "unable to set dwm status");
-#ifdef DEBUG
+#if defined(DEBUG) || defined(STATUS_ONCE)
 		exit(0);
 #endif
 

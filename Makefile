@@ -21,6 +21,10 @@ ifneq ($(ANIMATION),)
   CFLAGS += -DSTATUS_ANIMATION
 endif
 
+ifneq ($(ONCE),)
+  CFLAGS += -DSTATUS_ONCE
+endif
+
 LDFLAGS = $(LIBS)
 
 # Fake system files for debug.
