@@ -13,6 +13,10 @@
 #include <X11/Xlib.h>
 #endif /* CONSOLE_OUTPUT */
 
+#ifndef __linux__
+    #error "Only Linux is supported."
+#endif
+
 /* Constants and macros */
 #define LOAD_LEN 15
 #define STATUS_LEN 95

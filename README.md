@@ -45,6 +45,10 @@ mindwmbar # Put 'mindwmbar &' in your '~/.xinitrc'.
 * [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/)
 * [Xlib](https://www.x.org/releases/current/doc/libX11/libX11/libX11.html)
 
+# SUPPORTED OS
+
+* Linux
+
 # CONTRIBUTING
 
 When submitting PRs, please maintain the [coding
