@@ -22,11 +22,25 @@ endif
 
 LDFLAGS = $(LIBS)
 
+# Fake system files for debug.
+BATT_CAP = ./batt_capacity
+AC_PLUG  = ./ac_plug
+MEMINFO  = ./meminfo
+
 build:
 	$(CC) ./$(PROJECT).c $(CFLAGS) -O2 $(LDFLAGS) -o ./$(PROJECT)
 
 debug:
-	$(CC) ./$(PROJECT).c $(CFLAGS) -O0 -g $(LDFLAGS) -o ./$(PROJECT)
+	$(CC) ./$(PROJECT).c \
+		$(CFLAGS) -O0 -g \
+		-DDEBUG \
+		-DDEBUG_BATT_PATH=\"$(BATT_CAP)\" \
+		-DDEBUG_AC_PATH=\"$(AC_PLUG)\" \
+		-DMEMINFO_PATH=\"$(MEMINFO)\" \
+		$(LDFLAGS) -o ./$(PROJECT)
+
+test: debug
+	./test.sh $(BATT_CAP) $(AC_PLUG) $(MEMINFO)
 
 gdb: debug
 	gdb ./$(PROJECT)
@@ -42,4 +56,4 @@ uninstall:
 	rm -f "$(DESTDIR)$(PREFIX)/bin/$(PROJECT)"
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(PREFIX)/bin"
 
-.PHONY: all debug gdb memcheck memcheck_v memcheck_full clean install uninstall
+.PHONY: all debug test gdb clean install uninstall

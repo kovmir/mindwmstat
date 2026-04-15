@@ -26,6 +26,10 @@
 #define TIME_LEN 30
 #define AC_STATE_CHARGING '1'
 
+#ifndef DEBUG
+#define MEMINFO_PATH "/proc/meminfo"
+#endif
+
 /* Function prototypes */
 /* Get average CPU load; return true on success. */
 static bool get_load(char *buf);
@@ -41,6 +45,13 @@ static bool get_ram(int *ram_usage);
 static bool set_status(char *status);
 
 #include "config.h"
+
+#ifdef DEBUG
+/* Battery to read state from. */
+static const char *batt_path = DEBUG_BATT_PATH;
+/* AC/DC adapter to read state from. */
+static const char *ac_path = DEBUG_AC_PATH;
+#endif /* DEBUG */
 
 bool
 get_load(char *buf)
@@ -151,9 +162,9 @@ get_ram(int *ram_usage)
 		return false;
 	}
 
-	meminfo = fopen("/proc/meminfo", "r");
+	meminfo = fopen(MEMINFO_PATH, "r");
 	if (meminfo == NULL) {
-		warn("unable to open /proc/meminfo");
+		warn("unable to open %s", MEMINFO_PATH);
 		return false;
 	}
 	while (fgets(buf, sizeof(buf), meminfo)) {
@@ -186,7 +197,7 @@ set_status(char *status)
 		warnx("set_status status cannot be NULL");
 		return false;
 	}
-#ifdef CONSOLE_OUTPUT
+#if defined(CONSOLE_OUTPUT) || defined(DEBUG)
 	puts(status);
 #else
 	Display *display = XOpenDisplay(NULL);
@@ -291,6 +302,9 @@ main(void) {
 		ok = set_status(status_buf);
 		if (ok == false)
 			errx(1, "unable to set dwm status");
+#ifdef DEBUG
+		exit(0);
+#endif
 
 #ifdef STATUS_ANIMATION
 		if (curr_frame >= N_FRAMES)
