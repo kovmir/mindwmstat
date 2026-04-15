@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -16,12 +17,17 @@
 #define LOAD_LEN 15
 #define STATUS_LEN 95
 #define TIME_LEN 30
+#define AC_STATE_CHARGING '1'
 
 /* Function prototypes */
 /* Get average CPU load; return true on success. */
 static bool get_load(char *buf);
 /* Get local time; return true on success. */
 static bool get_time(char *buf);
+/* Get current battery capacity percentage; return true on success. */
+static bool get_charge(int *batt_charge);
+/* Get AC power plug state; return true on success. */
+static bool is_charging(bool *ac_state);
 /* Get RAM usage percentage; return true on success. */
 static bool get_ram(int *ram_usage);
 /* Set dwm status; return true on success. */
@@ -56,6 +62,63 @@ get_time(char *buf)
 		warnx("unable to get time (strftime)");
 		return false;
 	}
+	return true;
+}
+
+bool
+get_charge(int *batt_charge)
+{
+	FILE     *batt;
+	const int BUF_SIZE = 16;
+	char      buf[BUF_SIZE];
+
+	if (batt_charge == NULL) {
+		warnx("batt_charge cannot be NULL");
+		return false;
+	}
+
+	batt = fopen(batt_path, "r");
+	if (batt == NULL) {
+		/* Pollutes stderr on devices without battery. */
+		/* warn("unable to open %s", batt_path); */
+		return false;
+	}
+	if (fgets(buf, BUF_SIZE, batt) == NULL) {
+		warnx("unable to read %s", batt_path);
+		fclose(batt);
+		return false;
+	}
+	fclose(batt);
+
+	/* Error checking is pointless, I think. */
+	*batt_charge = (int)strtol(buf, NULL, 10);
+	return true;
+}
+
+bool
+is_charging(bool *charging)
+{
+	FILE *ac;
+	char  state;
+
+	if (charging == NULL) {
+		warnx("ac_state cannot be NULL");
+		return false;
+	}
+
+	ac = fopen(ac_path, "r");
+	if (ac == NULL) {
+		warn("unable to open %s", ac_path);
+		return false;
+	}
+	if ((state = fgetc(ac)) == EOF) {
+		warnx("unable to read AC power plug state");
+		fclose(ac);
+		return false;
+	}
+	fclose(ac);
+
+	*charging = state == AC_STATE_CHARGING ? true : false;
 	return true;
 }
 
@@ -119,13 +182,24 @@ main(void) {
 	char load_buf[LOAD_LEN];
 	char time_buf[TIME_LEN];
 	char status_buf[STATUS_LEN];
+	char ac_icon[2];
 	int  ram_usage;
+	int  batt_charge;
+	bool charging = false; /* Pointless init, hides GCC warning. */
 #ifdef STATUS_ANIMATION
 	unsigned int curr_frame = 0; /* Current animation frame. */
 #endif /* STATUS_ANIMATION */
 	bool ok;
 
+	if (get_charge(&batt_charge) == false)
+		warnx("no battery was detected");
+
 	for (;; sleep(status_delay)) {
+		/* Clean-up, just in case. */
+		memset(load_buf,   0, LOAD_LEN);
+		memset(time_buf,   0, TIME_LEN);
+		memset(status_buf, 0, STATUS_LEN);
+
 		ok = get_load(load_buf);
 		if (ok == false)
 			errx(1, "unable to get CPU load");
@@ -138,21 +212,55 @@ main(void) {
 		if (ok == false)
 			errx(1, "unable to get available memory");
 
-		snprintf(status_buf,
-			STATUS_LEN,
-			"%d%%%s%s%s%s"
+		/* Ensure string NULL-termination, just in case. */
+		load_buf[LOAD_LEN-1]     = 0;
+		time_buf[TIME_LEN-1]     = 0;
+		status_buf[STATUS_LEN-1] = 0;
+
+		if (get_charge(&batt_charge) == true) {
+			/* Battery exists. */
+			ok = is_charging(&charging);
+			if (ok == false)
+				errx(1, "unable to get charging status");
+			ac_icon[0] = charging ? '+' : 0;
+			ac_icon[1] = 0;
+
+			snprintf(status_buf,
+				STATUS_LEN,
+				"%d%%%s%s%s%s%s%s[%d%%]"
 #ifdef STATUS_ANIMATION
-			" %c"
+				" %c"
 #endif /* STATUS_ANIMATION */
-			, ram_usage,
-			status_delim,
-			load_buf,
-			status_delim,
-			time_buf
+				, ram_usage,
+				status_delim,
+				load_buf,
+				status_delim,
+				time_buf,
+				status_delim,
+				ac_icon,
+				batt_charge
 #ifdef STATUS_ANIMATION
-			, status_frames[curr_frame++]
+				, status_frames[curr_frame++]
 #endif /* STATUS_ANIMATION */
-			);
+				);
+		} else {
+			/* No battery. */
+			snprintf(status_buf,
+				STATUS_LEN,
+				"%d%%%s%s%s%s"
+#ifdef STATUS_ANIMATION
+				" %c"
+#endif /* STATUS_ANIMATION */
+				, ram_usage,
+				status_delim,
+				load_buf,
+				status_delim,
+				time_buf
+#ifdef STATUS_ANIMATION
+				, status_frames[curr_frame++]
+#endif /* STATUS_ANIMATION */
+				);
+		}
 
 		ok = set_status(status_buf);
 		if (ok == false)

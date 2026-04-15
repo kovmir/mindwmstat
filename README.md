@@ -7,16 +7,18 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 # PREVIEW
 
 ```
- +---- RAM Usage
- |
- v
-32% | 1.37 2.08 1.36 | 2026-04-14 Tue 14:16
-             ^                   ^
-             |                   |
-         CPU Load            Date & Time
+ +---- RAM Usage                             Power
+ |                                             |
+ v                                             v
+5% | 0.00 0.01 0.02 | 2026-04-15 Wed 09:31 | +[92%]
+           ^                   ^
+           |                   |
+       CPU Load            Date & Time
 ```
 
 ![screenshot](screenshot.png)
+
+*Power indicator disappears on non–battery-powered devices.*
 
 # INSTALL
 
