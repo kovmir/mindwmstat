@@ -27,10 +27,6 @@ git clone https://git.sr.ht/~kovmir/mindwmstat
 cd mindwmstat
 make # Optionally adjust config.h to your liking.
 sudo make install
-
-# make CONSOLE=1   # Print status bar to the console.
-# make ANIMATION=1 # Play animation in status bar, see config.h.
-# make ONCE=1      # Set status only once and terminate.
 ```
 
 # USAGE
