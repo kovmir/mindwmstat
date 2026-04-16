@@ -27,11 +27,11 @@ git clone https://git.sr.ht/~kovmir/mindwmstat
 cd mindwmstat
 make
 sudo make install
-```
 
-Use `make CONSOLE=1` for console output, or `ANIMATION=1` to add status bar
-animation to see whether it updates and how quickly, or `ONCE=1` to set status
-once and terminate.
+# make CONSOLE=1   # Print status bar to the console.
+# make ANIMATION=1 # Play animation in status bar, see config.h.
+# make ONCE=1      # Set status only once and terminate.
+```
 
 # USAGE
 
