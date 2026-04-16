@@ -25,7 +25,7 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 ```sh
 git clone https://git.sr.ht/~kovmir/mindwmstat
 cd mindwmstat
-make
+make # Optionally adjust config.h to your liking.
 sudo make install
 
 # make CONSOLE=1   # Print status bar to the console.
