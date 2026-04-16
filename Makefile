@@ -32,11 +32,13 @@ BATT_CAP = ./batt_capacity
 AC_PLUG  = ./ac_plug
 MEMINFO  = ./meminfo
 
+build: CFLAGS += -DBUILD_TYPE=\"release\"
 build:
 	$(CC) ./$(PROJECT).c $(CFLAGS) -O2 $(LDFLAGS) -o ./$(PROJECT)
 
 # No linking against X11.
 debug: LIBS :=
+debug: CFLAGS += -DBUILD_TYPE=\"debug\"
 debug:
 	$(CC) ./$(PROJECT).c \
 		$(CFLAGS) -O0 -g \
