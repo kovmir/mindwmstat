@@ -35,6 +35,8 @@ MEMINFO  = ./meminfo
 build:
 	$(CC) ./$(PROJECT).c $(CFLAGS) -O2 $(LDFLAGS) -o ./$(PROJECT)
 
+# No linking against X11.
+debug: LIBS :=
 debug:
 	$(CC) ./$(PROJECT).c \
 		$(CFLAGS) -O0 -g \
