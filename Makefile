@@ -27,9 +27,11 @@ endif
 
 LDFLAGS = $(LIBS)
 
-# Fake system files for debug.
-BATT_CAP = ./batt_capacity
-AC_PLUG  = ./ac_plug
+# Config values for debug builds.
+STATUS_DELIM = ' | '
+TIME_FORMAT = '%F %a %R'
+BATT_PATH = ./batt_capacity
+AC_PATH  = ./ac_plug
 MEMINFO  = ./meminfo
 
 build: CFLAGS += -DBUILD_TYPE=\"release\"
@@ -43,14 +45,16 @@ debug:
 	$(CC) ./$(PROJECT).c \
 		$(CFLAGS) -O0 -g \
 		-DDEBUG \
-		-DDEBUG_BATT_PATH=\"$(BATT_CAP)\" \
-		-DDEBUG_AC_PATH=\"$(AC_PLUG)\" \
+		-DDEBUG_STATUS_DELIM=\"$(STATUS_DELIM)\" \
+		-DDEBUG_TIME_FORMAT=\"$(TIME_FORMAT)\" \
+		-DDEBUG_BATT_PATH=\"$(BATT_PATH)\" \
+		-DDEBUG_AC_PATH=\"$(AC_PATH)\" \
 		-DMEMINFO_PATH=\"$(MEMINFO)\" \
 		$(LDFLAGS) -o ./$(PROJECT)
 
 # Run unit tests.
 test: debug
-	./test.sh $(BATT_CAP) $(AC_PLUG) $(MEMINFO)
+	./test.sh $(BATT_PATH) $(AC_PATH) $(MEMINFO)
 
 gdb: debug
 	gdb ./$(PROJECT)

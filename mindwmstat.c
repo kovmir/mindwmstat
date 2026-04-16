@@ -44,12 +44,13 @@ static bool get_ram(int *ram_usage);
 /* Set dwm status; return true on success. */
 static bool set_status(char *status);
 
+#ifndef DEBUG
 #include "config.h"
-
-#ifdef DEBUG
-/* Battery to read state from. */
+#else
+static const char *status_delim = DEBUG_STATUS_DELIM;
+static const int status_delay = 1; /* Does not matter. */
+static const char *time_format = DEBUG_TIME_FORMAT;
 static const char *batt_path = DEBUG_BATT_PATH;
-/* AC/DC adapter to read state from. */
 static const char *ac_path = DEBUG_AC_PATH;
 #endif /* DEBUG */
 
