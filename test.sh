@@ -17,8 +17,7 @@ Active(anon):    3512792 kB
 Inactive(anon):        0 kB
 EOF
 
-./mindwmstat 2>/dev/null | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d$/'
-if [[ $? == "0" ]]; then
+if ./mindwmstat 2>/dev/null | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d$/'; then
 	echo "1 OK"
 else
 	echo "1 NOT OK"
@@ -28,8 +27,7 @@ fi
 echo 69 > "$1"
 echo 1  > "$2"
 
-./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \+\[\d+%]$/'
-if [[ $? == "0" ]]; then
+if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \+\[\d+%]$/'; then
 	echo "2 OK"
 else
 	echo "2 NOT OK"
@@ -38,10 +36,11 @@ fi
 
 echo 0  > "$2"
 
-./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \[\d+%]$/'
-if [[ $? == "0" ]]; then
+if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \[\d+%]$/'; then
 	echo "3 OK"
 else
 	echo "3 NOT OK"
 	exit 1
 fi
+
+rm -rf "$1" "$2" "$3"
