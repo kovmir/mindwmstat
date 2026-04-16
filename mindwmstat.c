@@ -206,7 +206,7 @@ set_status(char *status)
 		warnx("unable to connect to display (XOpenDisplay)");
 		return false;
 	}
-	
+
 	XStoreName(display, XDefaultRootWindow(display), status);
 	XSync(display, false);
 	XCloseDisplay(display);
