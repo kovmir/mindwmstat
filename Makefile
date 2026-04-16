@@ -48,6 +48,7 @@ debug:
 		-DMEMINFO_PATH=\"$(MEMINFO)\" \
 		$(LDFLAGS) -o ./$(PROJECT)
 
+# Run unit tests.
 test: debug
 	./test.sh $(BATT_CAP) $(AC_PLUG) $(MEMINFO)
 

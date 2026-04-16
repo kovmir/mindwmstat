@@ -16,10 +16,6 @@
 #include <X11/Xlib.h>
 #endif /* CONSOLE_OUTPUT */
 
-#ifndef __linux__
-    #error "Only Linux is supported."
-#endif
-
 /* Constants and macros */
 #define LOAD_LEN 15
 #define STATUS_LEN 95
@@ -27,8 +23,12 @@
 #define AC_STATE_CHARGING '1'
 
 #ifndef DEBUG
+#ifndef __linux__
+    #error "Unsupported operating system."
+#endif /* __linux__ */
+
 #define MEMINFO_PATH "/proc/meminfo"
-#endif
+#endif /* DEBUG */
 
 /* Function prototypes */
 /* Get average CPU load; return true on success. */
@@ -210,7 +210,7 @@ set_status(char *status)
 	XStoreName(display, XDefaultRootWindow(display), status);
 	XSync(display, false);
 	XCloseDisplay(display);
-#endif
+#endif /* defined(CONSOLE_OUTPUT) || defined(DEBUG) */
 	return true;
 }
 
@@ -310,7 +310,7 @@ main(int argc, char *argv[]) {
 			errx(1, "unable to set dwm status");
 #if defined(DEBUG) || defined(STATUS_ONCE)
 		exit(0);
-#endif
+#endif /* defined(DEBUG) || defined(STATUS_ONCE) */
 
 #ifdef STATUS_ANIMATION
 		if (curr_frame >= N_FRAMES)
