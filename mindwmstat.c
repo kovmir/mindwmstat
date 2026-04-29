@@ -2,6 +2,7 @@
  * Copyright (c) 2026 Ivan Kovmir */
 
 /* Includes */
+#include <assert.h>
 #include <err.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -240,6 +241,7 @@ main(int argc, char *argv[]) {
 	if (get_charge(&batt_charge) == false)
 		warnx("no battery was detected");
 
+	assert(status_delay > 0);
 	for (;; sleep(status_delay)) {
 		/* Clean-up, just in case. */
 		memset(load_buf,   0, LOAD_LEN);

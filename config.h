@@ -19,4 +19,4 @@ static char status_frames[N_FRAMES] = {'|', '/', '-', '\\'};
 #endif /* STATUS_ANIMATION */
 
 /* Status (and thus animation) update interval in seconds. */
-static const int status_delay = 1;
+static const unsigned int status_delay = 1;
