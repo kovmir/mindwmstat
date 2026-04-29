@@ -177,7 +177,7 @@ get_ram(int *ram_usage)
 		if (sscanf(buf, "MemAvailable: %ld kB", &mem_avail) == 1)
 			continue;
 		if (mem_total != -1 && mem_avail != -1)
-			break; // Found everything.
+			break; /* Found everything. */
 	}
 	fclose(meminfo);
 
