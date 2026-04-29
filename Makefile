@@ -33,6 +33,8 @@ TIME_FORMAT = '%F %a %R'
 BATT_PATH = ./batt_capacity
 AC_PATH  = ./ac_plug
 MEMINFO  = ./meminfo
+CHARGE_ICON = +
+DISCHARGE_ICON = -
 
 build: CFLAGS += -DBUILD_TYPE=\"release\"
 build:
@@ -45,11 +47,13 @@ debug:
 	$(CC) ./$(PROJECT).c \
 		$(CFLAGS) -O0 -g \
 		-DDEBUG \
-		-DDEBUG_STATUS_DELIM=\"$(STATUS_DELIM)\" \
-		-DDEBUG_TIME_FORMAT=\"$(TIME_FORMAT)\" \
-		-DDEBUG_BATT_PATH=\"$(BATT_PATH)\" \
-		-DDEBUG_AC_PATH=\"$(AC_PATH)\" \
-		-DMEMINFO_PATH=\"$(MEMINFO)\" \
+		-DDEBUG_STATUS_DELIM=\"$(STATUS_DELIM)\"        \
+		-DDEBUG_TIME_FORMAT=\"$(TIME_FORMAT)\"          \
+		-DDEBUG_BATT_PATH=\"$(BATT_PATH)\"              \
+		-DDEBUG_AC_PATH=\"$(AC_PATH)\"                  \
+		-DMEMINFO_PATH=\"$(MEMINFO)\"                   \
+		-DDEBUG_AC_CHARGE_ICON=\'$(CHARGE_ICON)\'       \
+		-DDEBUG_AC_DISCHARGE_ICON=\'$(DISCHARGE_ICON)\' \
 		$(LDFLAGS) -o ./$(PROJECT)
 
 # Run unit tests.

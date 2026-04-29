@@ -52,6 +52,8 @@ static const int status_delay = 1; /* Does not matter. */
 static const char *time_format = DEBUG_TIME_FORMAT;
 static const char *batt_path = DEBUG_BATT_PATH;
 static const char *ac_path = DEBUG_AC_PATH;
+static const char ac_charge_icon = DEBUG_AC_CHARGE_ICON;
+static const char ac_discharge_icon = DEBUG_AC_DISCHARGE_ICON;
 #endif /* DEBUG */
 
 bool
@@ -266,12 +268,13 @@ main(int argc, char *argv[]) {
 			ok = is_charging(&charging);
 			if (ok == false)
 				errx(1, "unable to get charging status");
-			ac_icon[0] = charging ? '+' : 0;
+			ac_icon[0] = charging ?
+				ac_charge_icon : ac_discharge_icon;
 			ac_icon[1] = 0;
 
 			snprintf(status_buf,
 				STATUS_LEN,
-				"%d%%%s%s%s%s%s%s[%d%%]"
+				"%d%%%s%s%s%s%s%s%d%%"
 #ifdef STATUS_ANIMATION
 				" %c"
 #endif /* STATUS_ANIMATION */

@@ -27,7 +27,7 @@ fi
 echo 69 > "$1"
 echo 1  > "$2"
 
-if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \+\[\d+%]$/'; then
+if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \+\d+%$/'; then
 	echo "2 OK"
 else
 	echo "2 NOT OK"
@@ -36,7 +36,7 @@ fi
 
 echo 0  > "$2"
 
-if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| \[\d+%]$/'; then
+if ./mindwmstat | perl -ne 'exit 1 unless /^\d+% \| \d\.\d\d \d\.\d\d \d\.\d\d \| \d+-\d+-\d+ \w\w\w \d\d:\d\d \| -\d+%$/'; then
 	echo "3 OK"
 else
 	echo "3 NOT OK"
