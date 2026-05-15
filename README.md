@@ -10,7 +10,7 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
  +---- RAM Usage                             Power
  |                                             |
  v                                             v
-15% | 0.00 0.01 0.02 | 2026-04-15 Wed 09:31 | +92%
+15% | 0.00 0.01 0.02 | 2026-04-15 Wed 09:31 | v92%
            ^                   ^
            |                   |
        CPU Load            Date & Time
