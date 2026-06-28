@@ -1,6 +1,12 @@
+/* RECOMPILE THE PROGRAM YOU EDIT THIS FILE. */
+
+/* Increase if the status appears truncated. */
+#define STATUS_LEN 95
 /* Status elements delimiter. */
 static const char *status_delim = " | ";
 
+/* Try increasing if you encounter date & time errors. */
+#define TIME_LEN 30
 /* Time format. */
 static const char *time_format = "%F %a %R"; /* See date(1) for format. */
 

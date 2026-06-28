@@ -19,8 +19,6 @@
 
 /* Constants and macros */
 #define LOAD_LEN 15
-#define STATUS_LEN 95
-#define TIME_LEN 30
 #define AC_STATE_CHARGING '1'
 
 #ifndef DEBUG
@@ -48,8 +46,10 @@ static bool set_status(char *status);
 #ifndef DEBUG
 #include "config.h"
 #else
+#define STATUS_LEN 95
+#define TIME_LEN 30
 static const char *status_delim = DEBUG_STATUS_DELIM;
-static const int status_delay = 1; /* Does not matter. */
+static const int status_delay = 1; /* No effect. */
 static const char *time_format = DEBUG_TIME_FORMAT;
 static const char *batt_path = DEBUG_BATT_PATH;
 static const char *ac_path = DEBUG_AC_PATH;
@@ -62,10 +62,7 @@ get_load(char *buf)
 {
 	double load[3];
 
-	if (buf == NULL) {
-		warnx("get_load buf cannot be NULL");
-		return false;
-	}
+	assert(buf != NULL);
 
 	if (getloadavg(load, 3) != 3) {
 		warnx("unable to get cpu load");
@@ -80,18 +77,16 @@ get_time(char *buf)
 {
 	time_t t = time(NULL);
 
-	if (buf == NULL) {
-		warnx("get_time buf cannot be NULL");
-		return false;
-	}
+	assert(buf != NULL);
 
 	struct tm *tm = localtime(&t);
-	if (!tm) {
+	if (tm == NULL) {
 		warnx("unable to get time (localtime)");
 		return false;
 	}
-	if (!strftime(buf, TIME_LEN, time_format, tm)) {
-		warnx("unable to get time (strftime)");
+	if (strftime(buf, TIME_LEN, time_format, tm) == 0) {
+		warnx("unable to get time (strftime);"
+		      " try to increase the buffer");
 		return false;
 	}
 	return true;
@@ -104,10 +99,7 @@ get_charge(int *batt_charge)
 	const int BUF_SIZE = 16;
 	char      buf[BUF_SIZE];
 
-	if (batt_charge == NULL) {
-		warnx("batt_charge cannot be NULL");
-		return false;
-	}
+	assert(batt_charge != NULL);
 
 	batt = fopen(batt_path, "r");
 	if (batt == NULL) {
@@ -133,10 +125,7 @@ is_charging(bool *charging)
 	FILE *ac;
 	char  state;
 
-	if (charging == NULL) {
-		warnx("ac_state cannot be NULL");
-		return false;
-	}
+	assert(charging != NULL);
 
 	ac = fopen(ac_path, "r");
 	if (ac == NULL) {
@@ -161,10 +150,7 @@ get_ram(int *ram_usage)
 	char buf[2048];
 	long mem_total = -1, mem_avail = -1;
 
-	if (ram_usage == NULL) {
-		warnx("ram_usage cannot be NULL");
-		return false;
-	}
+	assert(ram_usage != NULL);
 
 	meminfo = fopen(MEMINFO_PATH, "r");
 	if (meminfo == NULL) {
@@ -197,10 +183,7 @@ get_ram(int *ram_usage)
 bool
 set_status(char *status)
 {
-	if (status == NULL) {
-		warnx("set_status status cannot be NULL");
-		return false;
-	}
+	assert(status != NULL);
 #if defined(CONSOLE_OUTPUT) || defined(DEBUG)
 	puts(status);
 #else
