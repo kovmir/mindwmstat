@@ -7,13 +7,13 @@ Minimal [dwm](https://dwm.suckless.org/) status bar
 # PREVIEW
 
 ```
- +---- RAM Usage                             Power
+ +---- RAM Usage                            Battery
  |                                             |
  v                                             v
-15% | 0.00 0.01 0.02 | 2026-04-15 Wed 09:31 | v92%
-           ^                   ^
-           |                   |
-       CPU Load            Date & Time
+15% | 0.00 0.01 0.02 | 2026-04-15 Wed 09:31 | ^92%
+           ^                   ^              ^
+           |                   |              |
+       CPU Load            Date & Time     AC Plug
 ```
 
 ![screenshot](screenshot.png)
