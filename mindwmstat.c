@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -188,15 +187,20 @@ set_status(char *status)
 	puts(status);
 #else
 	Display *display = XOpenDisplay(NULL);
+	int retx;
 
 	if (display == NULL) {
 		warnx("unable to connect to display (XOpenDisplay)");
 		return false;
 	}
 
-	XStoreName(display, XDefaultRootWindow(display), status);
-	XSync(display, false);
-	XCloseDisplay(display);
+	retx = XStoreName(display, XDefaultRootWindow(display), status);
+	if (retx == 0) {
+		warnx("failed to set root window title (XStoreName)");
+		return false;
+	}
+	XSync(display, false);  /* Always ok. */
+	XCloseDisplay(display); /* Always ok. */
 #endif /* defined(CONSOLE_OUTPUT) || defined(DEBUG) */
 	return true;
 }
@@ -226,11 +230,6 @@ main(int argc, char *argv[]) {
 
 	assert(status_delay > 0);
 	for (;; sleep(status_delay)) {
-		/* Clean-up, just in case. */
-		memset(load_buf,   0, LOAD_LEN);
-		memset(time_buf,   0, TIME_LEN);
-		memset(status_buf, 0, STATUS_LEN);
-
 		ok = get_load(load_buf);
 		if (ok == false)
 			errx(1, "unable to get CPU load");
@@ -242,11 +241,6 @@ main(int argc, char *argv[]) {
 		ok = get_ram(&ram_usage);
 		if (ok == false)
 			errx(1, "unable to get available memory");
-
-		/* Ensure string NULL-termination, just in case. */
-		load_buf[LOAD_LEN-1]     = 0;
-		time_buf[TIME_LEN-1]     = 0;
-		status_buf[STATUS_LEN-1] = 0;
 
 		if (get_charge(&batt_charge) == true) {
 			/* Battery exists. */
