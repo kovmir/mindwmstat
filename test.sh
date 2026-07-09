@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Unit tests for mindwmstat.
 # Usage: ./test.sh /path/to/batt /path/to/ac /path/to/meminfo
+if [[ "$#" == 0 ]]; then
+	echo 'Run `make test`; do not invoke this script directly.'
+	exit 1
+fi
 
 rm -f "$1"
 rm -f "$2"
