@@ -20,6 +20,7 @@
 #define LOAD_LEN 15
 #define AC_STATE_CHARGING '1'
 
+/* Code under DEBUGs is for unit testing. */
 #ifndef DEBUG
 #ifndef __linux__
 #error "Unsupported operating system."
