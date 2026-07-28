@@ -1,4 +1,4 @@
-/* RECOMPILE THE PROGRAM YOU EDIT THIS FILE. */
+/* RECOMPILE THE PROGRAM IF YOU EDIT THIS FILE. */
 
 /* Increase if the status appears truncated. */
 #define STATUS_LEN 95
