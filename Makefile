@@ -21,10 +21,6 @@ ifneq ($(ANIMATION),)
   CFLAGS += -DSTATUS_ANIMATION
 endif
 
-ifneq ($(ONCE),)
-  CFLAGS += -DSTATUS_ONCE
-endif
-
 LDFLAGS = $(LIBS)
 
 # Config values for debug builds.

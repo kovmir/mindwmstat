@@ -41,7 +41,9 @@ static bool is_charging(bool *ac_state);
 /* Get RAM usage percentage; return true on success. */
 static bool get_ram(int *ram_usage);
 /* Set dwm status; return true on success. */
-static bool set_status(char *status);
+#ifndef DEBUG
+static bool set_xstatus(Display *display, char *status);
+#endif /* DEBUG */
 
 #ifndef DEBUG
 #include "config.h"
@@ -180,31 +182,22 @@ get_ram(int *ram_usage)
 	return true;
 }
 
+#ifndef DEBUG
 bool
-set_status(char *status)
+set_xstatus(Display *display, char *status)
 {
+	assert(display != NULL);
 	assert(status != NULL);
-#if defined(CONSOLE_OUTPUT) || defined(DEBUG)
-	puts(status);
-#else
-	Display *display = XOpenDisplay(NULL);
-	int retx;
 
-	if (display == NULL) {
-		warnx("unable to connect to display (XOpenDisplay)");
-		return false;
-	}
-
-	retx = XStoreName(display, XDefaultRootWindow(display), status);
+	int retx = XStoreName(display, XDefaultRootWindow(display), status);
 	if (retx == 0) {
 		warnx("failed to set root window title (XStoreName)");
 		return false;
 	}
 	XSync(display, false);  /* Always ok. */
-	XCloseDisplay(display); /* Always ok. */
-#endif /* defined(CONSOLE_OUTPUT) || defined(DEBUG) */
 	return true;
 }
+#endif /* DEBUG */
 
 int
 main(int argc, char *argv[]) {
@@ -219,6 +212,12 @@ main(int argc, char *argv[]) {
 	unsigned int curr_frame = 0; /* Current animation frame. */
 #endif /* STATUS_ANIMATION */
 	bool ok;
+
+#ifndef DEBUG
+	Display *display = XOpenDisplay(NULL);
+	if (display == NULL)
+		errx(1, "unable to open X display");
+#endif /* DEBUG */
 
 	(void)argv; /* Suppress -Wunused-parameter. */
 	if (argc > 1) {
@@ -288,13 +287,14 @@ main(int argc, char *argv[]) {
 #endif /* STATUS_ANIMATION */
 				);
 		}
-
-		ok = set_status(status_buf);
+#ifdef DEBUG
+		puts(status_buf);
+		exit(0);
+#else
+		ok = set_xstatus(display, status_buf);
 		if (ok == false)
 			errx(1, "unable to set dwm status");
-#if defined(DEBUG) || defined(STATUS_ONCE)
-		exit(0);
-#endif /* defined(DEBUG) || defined(STATUS_ONCE) */
+#endif /* DEBUG */
 
 #ifdef STATUS_ANIMATION
 		/* Advance animation frame. */
