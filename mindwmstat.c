@@ -267,7 +267,7 @@ main(int argc, char *argv[]) {
 				ac_icon,
 				batt_charge
 #ifdef STATUS_ANIMATION
-				, status_frames[curr_frame++]
+				, status_frames
 #endif /* STATUS_ANIMATION */
 				);
 		} else {
@@ -284,7 +284,7 @@ main(int argc, char *argv[]) {
 				status_delim,
 				time_buf
 #ifdef STATUS_ANIMATION
-				, status_frames[curr_frame++]
+				, status_frames
 #endif /* STATUS_ANIMATION */
 				);
 		}
@@ -297,8 +297,8 @@ main(int argc, char *argv[]) {
 #endif /* defined(DEBUG) || defined(STATUS_ONCE) */
 
 #ifdef STATUS_ANIMATION
-		if (curr_frame >= N_FRAMES)
-			curr_frame = 0; /* Animation reset. */
+		/* Advance animation frame. */
+		curr_frame = (curr_frame + 1) % N_FRAMES
 #endif /* STATUS_ANIMATION */
 	}
 }
