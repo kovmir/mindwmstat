@@ -171,7 +171,7 @@ get_ram(int *ram_usage)
 		warnx("unable to parse /proc/meminfo");
 		return false;
 	}
-	if (mem_total == 0) { /* Ponitless? */
+	if (mem_total == 0) { /* Pointless? */
 		warnx("MemTotal is zero, cannot calculate used RAM");
 		return false;
 	}
