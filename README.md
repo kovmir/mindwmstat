@@ -1,7 +1,5 @@
 # mindwmstat
 
-[![builds.sr.ht status](https://builds.sr.ht/~kovmir/mindwmstat/commits/master/.build.yml.svg)](https://builds.sr.ht/~kovmir/mindwmstat/commits/master/.build.yml?)
-
 Minimal [dwm](https://dwm.suckless.org/) status bar
 
 # PREVIEW
@@ -37,6 +35,7 @@ mindwmstat # Put 'mindwmbar &' in your '~/.xinitrc'.
 
 # DEPENDENCIES
 
+* [Git](https://git-scm.com/)
 * [GNU Make](https://www.gnu.org/software/make/)
 * [pkg-config](https://gitlab.freedesktop.org/pkg-config/pkg-config)
 * [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/)

@@ -1,73 +1,59 @@
 CC ?= cc
-INSTALL ?= install
-PREFIX ?= /usr/local
-PROJECT = mindwmstat
 
-CFLAGS += -std=c23
+X11_CFLAGS := $(shell pkg-config --cflags x11)
+X11_LDLIBS := $(shell pkg-config --libs x11)
+GIT_VERSION := $(shell git describe --tags --always --dirty)
+
+CFLAGS += -std=c99
+CFLAGS += -g
+CFLAGS += -O2
 CFLAGS += -pedantic
 CFLAGS += -Wall
 CFLAGS += -Wextra
-CFLAGS += -Wstrict-prototypes
-CFLAGS += -DGIT_DESC=\"$(shell git describe --tags --always --dirty)\"
 CFLAGS += -D_DEFAULT_SOURCE
+CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 
 ifneq ($(CONSOLE),)
   CFLAGS += -DCONSOLE_OUTPUT
 else
-  LIBS = $(shell pkg-config --libs x11)
+  LDLIBS += $(X11_LDLIBS)
+  CFLAGS += $(X11_CFLAGS)
 endif
 
 ifneq ($(ANIMATION),)
   CFLAGS += -DSTATUS_ANIMATION
 endif
 
-LDFLAGS = $(LIBS)
+LDLIBS += $(LIB_LDLIBS)
 
-# Config values for debug builds.
-STATUS_DELIM = ' | '
-TIME_FORMAT = '%F %a %R'
-BATT_PATH = ./batt_capacity
-AC_PATH  = ./ac_plug
-MEMINFO  = ./meminfo
-CHARGE_ICON = +
-DISCHARGE_ICON = -
+BUILD_BIN := mindwmstat
+TEST_BIN  := stats_test
 
-build: CFLAGS += -DBUILD_TYPE=\"release\"
-build:
-	$(CC) ./$(PROJECT).c $(CFLAGS) -O2 $(LDFLAGS) -o ./$(PROJECT)
+PREFIX ?= /usr/local
 
-# No linking against X11.
-debug: LIBS :=
-debug: CFLAGS += -DBUILD_TYPE=\"debug\"
-debug:
-	$(CC) ./$(PROJECT).c \
-		$(CFLAGS) -O0 -g \
-		-DDEBUG \
-		-DDEBUG_STATUS_DELIM=\"$(STATUS_DELIM)\"        \
-		-DDEBUG_TIME_FORMAT=\"$(TIME_FORMAT)\"          \
-		-DDEBUG_BATT_PATH=\"$(BATT_PATH)\"              \
-		-DDEBUG_AC_PATH=\"$(AC_PATH)\"                  \
-		-DMEMINFO_PATH=\"$(MEMINFO)\"                   \
-		-DDEBUG_AC_CHARGE_ICON=\'$(CHARGE_ICON)\'       \
-		-DDEBUG_AC_DISCHARGE_ICON=\'$(DISCHARGE_ICON)\' \
-		$(LDFLAGS) -o ./$(PROJECT)
+all: build
 
-# Run unit tests.
-test: debug
-	./test.sh $(BATT_PATH) $(AC_PATH) $(MEMINFO)
+build: $(BUILD_BIN)
 
-gdb: debug
-	gdb ./$(PROJECT)
+test: $(TEST_BIN)
 
-clean:
-	rm -f ./$(PROJECT)
+$(BUILD_BIN): main.o stats.o
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
+$(TEST_BIN): stats_test.o stats.o
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
+main.o: config.h stats.h
+
+stats.o: stats.h
 
 install:
-	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
-	$(INSTALL) ./$(PROJECT) "$(DESTDIR)$(PREFIX)/bin/$(PROJECT)"
+	install -Dm755 ./$(BUILD_BIN) "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
 
 uninstall:
-	rm -f "$(DESTDIR)$(PREFIX)/bin/$(PROJECT)"
-	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(PREFIX)/bin"
+	rm -f "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
 
-.PHONY: all debug test gdb clean install uninstall
+clean:
+	rm -f *.o $(BUILD_BIN) $(TEST_BIN)
+
+.PHONY: all build test install uninstall clean

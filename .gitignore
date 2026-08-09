@@ -1,4 +1,3 @@
 mindwmstat
-batt_capacity
-ac_plug
-meminfo
+stats_test
+*.o

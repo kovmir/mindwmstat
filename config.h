@@ -1,7 +1,7 @@
 /* RECOMPILE THE PROGRAM IF YOU EDIT THIS FILE. */
 
 /* Increase if the status appears truncated. */
-#define STATUS_LEN 95
+#define STATUS_LEN 128
 /* Status elements delimiter. */
 static const char *status_delim = " | ";
 
@@ -15,8 +15,8 @@ static const char *batt_path = "/sys/class/power_supply/BAT0/capacity";
 /* AC power plug. */
 static const char *ac_path = "/sys/class/power_supply/AC/online";
 /* Battery charge and discharge icons. */
-static const char ac_charge_icon    = '^'; /* =0 no icon. */
-static const char ac_discharge_icon = 'v'; /* =0 no icon. */
+static const char charge_icon    = '^'; /* =0 no icon. */
+static const char discharge_icon = 'v'; /* =0 no icon. */
 
 /* Status refresh animation frames; indicates whether the status is alive. */
 #ifdef STATUS_ANIMATION
