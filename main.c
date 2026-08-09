@@ -13,6 +13,10 @@
 
 #include "stats.h"
 
+#define SUPPORT_URL "https://github.com/kovmir/mindwmstat/issues"
+#ifndef GIT_VERSION
+#define GIT_VERSION "dev"
+#endif /* GIT_VERSION */
 #define LOAD_LEN 16
 #define BATTERY_EXISTS() (cap_fd != -1 && ac_fd != -1)
 
@@ -35,7 +39,7 @@ set_x11status(Display *display, char *status)
 #endif /* CONSOLE_OUTPUT */
 
 int
-main(void)
+main(int argc, char *argv[])
 {
 	char load_buf[LOAD_LEN];
 	char time_buf[TIME_LEN];
@@ -51,7 +55,16 @@ main(void)
 	FILE *meminfo;
 #ifndef CONSOLE_OUTPUT
 	Display *display;
+#endif /* CONSOLE_OUTPUT */
 
+	(void)argv;
+	if (argc > 1) {
+		printf("%s\n", GIT_VERSION);
+		printf("Support: %s\n", SUPPORT_URL);
+		return 0;
+	}
+
+#ifndef CONSOLE_OUTPUT
 	display = XOpenDisplay(NULL);
 	if (display == NULL)
 		errx(1, "unable to open X display");
