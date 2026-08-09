@@ -15,9 +15,8 @@ CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 
 ifneq ($(CONSOLE),)
   CFLAGS += -DCONSOLE_OUTPUT
-else
-  LDLIBS += $(X11_LDLIBS)
-  CFLAGS += $(X11_CFLAGS)
+  X11_LDLIBS :=
+  X11_CFLAGS :=
 endif
 
 ifneq ($(ANIMATION),)
@@ -37,6 +36,8 @@ build: $(BUILD_BIN)
 
 test: $(TEST_BIN)
 
+$(BUILD_BIN): LDLIBS += $(X11_LDLIBS)
+$(BUILD_BIN): CFLAGS += $(X11_CFLAGS)
 $(BUILD_BIN): main.o stats.o
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
