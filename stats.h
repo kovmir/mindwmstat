@@ -25,7 +25,8 @@ typedef struct {
 int get_load(char *out_buf, size_t out_len);
 /* Get current system date & time. */
 int get_time(char *out_buf, size_t out_len, const char *format, time_t t);
-/* Query power state. */
+/* Query power state.
+ * The caller must lseek(2) the file descriptors between successive calls. */
 int get_battery(BatteryInfo *bi, int cap_fd, int ac_fd);
 /* Get occupied RAM: 0 to 100%. */
 int get_memory(int *out_buf, FILE *meminfo);

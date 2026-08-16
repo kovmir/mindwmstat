@@ -1,12 +1,9 @@
 /* SPDX-License-Identifier: MIT
  * Copyright (c) 2026 Ivan Kovmir */
 #include <assert.h>
-#include <err.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 
 #include "stats.h"
@@ -21,6 +18,11 @@ read_int(int *out_buf, int fd)
 	char buf[32];
 	long int value;
 
+	/* FIX: seek back to start so repeated reads on the same fd
+	 * return fresh data instead of hitting EOF after the first call. */
+	if (lseek(fd, 0, SEEK_SET) == (off_t)-1)
+		return -1;
+
 	/* Read the file. */
 	n_read = read(fd, buf, sizeof(buf)-1);
 	if (n_read <= 0)
@@ -32,13 +34,20 @@ read_int(int *out_buf, int fd)
 	value = strtol(buf, &endp, 10);
 
 	/* Error checking... */
-	if (value > INT_MAX || value < INT_MIN)
-		return -1; /* Integer overwlow. */
-	if (errno != 0) {
-		return -1; /* Parse error. */
-	}
-	if (buf == endp) {
+	if (buf == endp)
 		return -1; /* No integer found. */
+	if (errno != 0)
+		return -1; /* Parse error / strtol overflow. */
+	if (value > INT_MAX || value < INT_MIN)
+		return -1; /* Integer overflow — value fits in long but not int. */
+	/* FIX: reject trailing garbage. Previously "123abc" would silently
+	 * parse as 123. Now we verify that anything after the number is
+	 * whitespace or end-of-string. */
+	while (*endp != '\0') {
+		if (*endp != ' ' && *endp != '\t' &&
+		    *endp != '\n' && *endp != '\r')
+			return -1; /* Trailing garbage. */
+		endp++;
 	}
 
 	/* Good. */
