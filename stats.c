@@ -19,6 +19,9 @@ read_int(int *out_buf, int fd)
 	long int value;
 	ssize_t r;
 
+	assert(out_buf != NULL);
+	assert(fd > 0);
+
 	/* Read the file. Loop to handle short reads and EINTR. */
 	n_read = 0;
 	while (n_read < sizeof(buf)-1) {
