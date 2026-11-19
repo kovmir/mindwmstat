@@ -8,9 +8,9 @@
 
 #include "stats.h"
 
-int read_int(int *out_buf, int fd);
+static int read_int(int *out_buf, int fd);
 
-int
+static int
 read_int(int *out_buf, int fd)
 {
 	char *endp;
