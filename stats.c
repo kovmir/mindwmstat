@@ -17,15 +17,22 @@ read_int(int *out_buf, int fd)
 	size_t n_read;
 	char buf[32];
 	long int value;
+	ssize_t r;
 
-	/* FIX: seek back to start so repeated reads on the same fd
-	 * return fresh data instead of hitting EOF after the first call. */
-	if (lseek(fd, 0, SEEK_SET) == (off_t)-1)
-		return -1;
-
-	/* Read the file. */
-	n_read = read(fd, buf, sizeof(buf)-1);
-	if (n_read <= 0)
+	/* Read the file. Loop to handle short reads and EINTR. */
+	n_read = 0;
+	while (n_read < sizeof(buf)-1) {
+		r = read(fd, buf + n_read, sizeof(buf)-1 - n_read);
+		if (r == -1) {
+			if (errno == EINTR)
+				continue; /* Interrupted: retry. */
+			return -1;
+		}
+		if (r == 0)
+			break; /* EOF. */
+		n_read += (size_t)r;
+	}
+	if (n_read == 0)
 		return -1;
 	buf[n_read] = '\0';
 
@@ -39,10 +46,8 @@ read_int(int *out_buf, int fd)
 	if (errno != 0)
 		return -1; /* Parse error / strtol overflow. */
 	if (value > INT_MAX || value < INT_MIN)
-		return -1; /* Integer overflow — value fits in long but not int. */
-	/* FIX: reject trailing garbage. Previously "123abc" would silently
-	 * parse as 123. Now we verify that anything after the number is
-	 * whitespace or end-of-string. */
+		return -1; /* Integer overflow — fits in long but not int. */
+	/* Reject trailing garbage. "123abc" should not silently parse as 123. */
 	while (*endp != '\0') {
 		if (*endp != ' ' && *endp != '\t' &&
 		    *endp != '\n' && *endp != '\r')
@@ -54,6 +59,7 @@ read_int(int *out_buf, int fd)
 	*out_buf = value;
 	return 0;
 }
+
 
 int
 get_load(char *out_buf, size_t out_len)
