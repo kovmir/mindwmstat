@@ -2,7 +2,7 @@ CC ?= cc
 
 X11_CFLAGS := $(shell pkg-config --cflags x11)
 X11_LDLIBS := $(shell pkg-config --libs x11)
-GIT_VERSION := $(shell git describe --tags --always --dirty)
+GIT_VERSION := $(shell git describe --tags --always --dirty 2>/dev/null)
 
 CFLAGS += -std=c99
 CFLAGS += -g
@@ -11,7 +11,10 @@ CFLAGS += -pedantic
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -D_DEFAULT_SOURCE
-CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
+
+ifneq ($(GIT_VERSION),)
+  CFLAGS += -DGIT_VERSION='"$(GIT_VERSION)"'
+endif
 
 ifneq ($(CONSOLE),)
   CFLAGS += -DCONSOLE_OUTPUT

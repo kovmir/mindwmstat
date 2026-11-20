@@ -35,7 +35,6 @@ mindwmstat # Put 'mindwmbar &' in your '~/.xinitrc'.
 
 # DEPENDENCIES
 
-* [Git](https://git-scm.com/)
 * [GNU Make](https://www.gnu.org/software/make/)
 * [pkg-config](https://gitlab.freedesktop.org/pkg-config/pkg-config)
 * [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/)
