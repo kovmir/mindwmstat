@@ -2,6 +2,7 @@
  * Copyright (c) 2026 Ivan Kovmir */
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,7 +21,7 @@ read_int(int *out_buf, int fd)
 	ssize_t r;
 
 	assert(out_buf != NULL);
-	assert(fd > 0);
+	assert(fd >= 0);
 
 	/* Read the file. Loop to handle short reads and EINTR. */
 	n_read = 0;
@@ -63,9 +64,8 @@ read_int(int *out_buf, int fd)
 	return 0;
 }
 
-
 int
-get_load(char *out_buf, size_t out_len)
+load_query(char *out_buf, size_t out_len)
 {
 	double load[3];
 
@@ -79,7 +79,7 @@ get_load(char *out_buf, size_t out_len)
 }
 
 int
-get_time(char *out_buf, size_t out_len, const char *format, time_t t)
+time_query(char *out_buf, size_t out_len, const char *format, time_t t)
 {
 	struct tm *tm;
 
@@ -95,23 +95,72 @@ get_time(char *out_buf, size_t out_len, const char *format, time_t t)
 }
 
 int
-get_battery(BatteryInfo *bi, int cap_fd, int ac_fd)
+battery_open(const char *batt_path, const char *ac_path,
+             Battery *batt, const char **failed_path)
 {
 	int tmp;
 
-	assert(bi != NULL);
+	assert(batt_path != NULL);
+	assert(ac_path != NULL);
+	assert(batt != NULL);
 
-	if (read_int(&tmp, cap_fd) != 0)
+	batt->cap_fd = -1;
+	batt->ac_fd = -1;
+	tmp = open(batt_path, O_RDONLY);
+	if (tmp == -1) {
+		if (failed_path != NULL)
+			*failed_path = batt_path;
+		return -1;
+	}
+	batt->cap_fd = tmp;
+	tmp = open(ac_path, O_RDONLY);
+	if (tmp == -1) {
+		if (failed_path != NULL)
+			*failed_path = ac_path;
+		close(batt->cap_fd);
+		batt->cap_fd = -1;
+		return -1;
+	}
+	batt->ac_fd = tmp;
+	return 0;
+}
+
+int
+battery_query(Battery batt, BatteryInfo *bi)
+{
+	int tmp;
+
+	assert(batt.cap_fd >= 0);
+	assert(batt.ac_fd >= 0);
+
+	if (lseek(batt.cap_fd, 0, SEEK_SET) ||
+	    lseek(batt.ac_fd, 0, SEEK_SET))
+		return -1;
+	if (read_int(&tmp, batt.cap_fd) != 0)
 		return -1;
 	bi->capacity = tmp;
-	if (read_int(&tmp, ac_fd) != 0)
+	if (read_int(&tmp, batt.ac_fd) != 0)
 		return -1;
 	bi->power_state = (tmp == 1) ? POWER_AC : POWER_BATTERY;
 	return 0;
 }
 
+void
+battery_close(Battery *batt)
+{
+	assert(batt != NULL);
+	if (batt->cap_fd != -1) {
+		close(batt->cap_fd);
+		batt->cap_fd = -1;
+	}
+	if (batt->ac_fd != -1) {
+		close(batt->ac_fd);
+		batt->ac_fd = -1;
+	}
+}
+
 int
-get_memory(int *out_buf, FILE *meminfo)
+memory_query(int *out_buf, FILE *meminfo)
 {
 	char buf[1024];
 	long mem_total = -1, mem_avail = -1;

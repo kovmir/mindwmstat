@@ -18,7 +18,7 @@
 #define GIT_VERSION "dev"
 #endif /* GIT_VERSION */
 #define LOAD_LEN 16
-#define BATTERY_EXISTS() (cap_fd != -1 && ac_fd != -1)
+#define BATTERY_EXISTS(batt) ((batt).cap_fd != -1 && (batt).ac_fd != -1)
 
 #include "config.h"
 
@@ -44,15 +44,18 @@ main(int argc, char *argv[])
 	char load_buf[LOAD_LEN];
 	char time_buf[TIME_LEN];
 	char status_buf[STATUS_LEN];
-	BatteryInfo bi;
-	int mem_usage;
 	size_t off;
+	FILE *meminfo;
+	int mem_usage;
+
+	BatteryInfo bi;
+	Battery batt;
+	const char *failed_path = NULL;
+
 #ifdef STATUS_ANIMATION
 	int curr_frame = 0;
 #endif /* STATUS_ANIMATION */
 
-	int cap_fd = -1, ac_fd = -1;
-	FILE *meminfo;
 #ifndef CONSOLE_OUTPUT
 	Display *display;
 #endif /* CONSOLE_OUTPUT */
@@ -70,31 +73,24 @@ main(int argc, char *argv[])
 		errx(1, "unable to open X display");
 #endif /* CONSOLE_OUTPUT */
 
+	if (battery_open(batt_path, ac_path, &batt, &failed_path) == -1)
+		warn("battery not found %s", failed_path);
+
 	meminfo = fopen("/proc/meminfo", "r");
 	if (meminfo == NULL)
 		err(1, "unable to open /proc/meminfo");
 
-	cap_fd = open(batt_path, O_RDONLY);
-	if (cap_fd == -1)
-		warn("battery not found %s", batt_path);
-	if (cap_fd != -1) {
-		/* Check AC power cord iff the battery has been found. */
-		ac_fd = open(ac_path, O_RDONLY);
-		if (cap_fd == -1)
-			warn("AC plug not found %s", ac_path);
-	}
-
 	assert(status_delay > 0);
 	for (;; sleep(status_delay))
 	{
-		if (get_load(load_buf, LOAD_LEN) == -1)
+		if (load_query(load_buf, LOAD_LEN) == -1)
 			errx(1, "unable to get CPU load");
-		if (get_time(time_buf, TIME_LEN, time_format, time(NULL)) == -1)
+		if (time_query(time_buf, TIME_LEN, time_format, time(NULL)) == -1)
 			errx(1, "unable to get date and time");
-		if (get_memory(&mem_usage, meminfo) == -1)
+		if (memory_query(&mem_usage, meminfo) == -1)
 			errx(1, "unable to get RAM usage");
-		if (BATTERY_EXISTS()) {
-			if (get_battery(&bi, cap_fd, ac_fd) == -1)
+		if (BATTERY_EXISTS(batt)) {
+			if (battery_query(batt, &bi) == -1)
 				errx(1, "unable to get battery info");
 		}
 
@@ -103,7 +99,7 @@ main(int argc, char *argv[])
 		         load_buf,  status_delim,
 		         time_buf);
 
-		if (BATTERY_EXISTS()) {
+		if (BATTERY_EXISTS(batt)) {
 			off = strlen(status_buf);
 			snprintf(status_buf + off, STATUS_LEN - off, "%s%c%d",
 			         status_delim,
@@ -122,9 +118,6 @@ main(int argc, char *argv[])
 #else
 		set_x11status(display, status_buf);
 #endif /* CONSOLE_OUTPUT */
-
 		rewind(meminfo);
-		lseek(cap_fd, 0, SEEK_SET);
-		lseek(ac_fd, 0, SEEK_SET);
 	}
 }

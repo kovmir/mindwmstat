@@ -15,20 +15,30 @@ typedef enum {
 
 /* Battery state. */
 typedef struct {
-	int        capacity; /* Battery capacity: 0 to 100%. */
+	int        capacity; /* Battery capacity 0 to 100%. */
 	PowerState power_state;
 } BatteryInfo;
+
+/* Battery handle. */
+typedef struct {
+	int cap_fd;
+	int ac_fd;
+} Battery;
 
 /* All functions return -1 on failure, and 0 on success. */
 
 /* Return system load in /proc/loadavg fashion. */
-int get_load(char *out_buf, size_t out_len);
+int load_query(char *out_buf, size_t out_len);
 /* Get current system date & time. */
-int get_time(char *out_buf, size_t out_len, const char *format, time_t t);
-/* Query power state.
- * The caller must lseek(2) the file descriptors between successive calls. */
-int get_battery(BatteryInfo *bi, int cap_fd, int ac_fd);
+int time_query(char *out_buf, size_t out_len, const char *format, time_t t);
+/* Open (file descriptors) battery, must be called prior to query_battery(). */
+int battery_open(const char *batt_path, const char *ac_path,
+                 Battery *batt, const char **failed_path);
+/* Query power state. */
+int battery_query(Battery batt, BatteryInfo *bi);
+/* Close (release file descriptors) battery when no longer needed. */
+void battery_close(Battery *batt);
 /* Get occupied RAM: 0 to 100%. */
-int get_memory(int *out_buf, FILE *meminfo);
+int memory_query(int *out_buf, FILE *meminfo);
 
 #endif /* STATS_H */
