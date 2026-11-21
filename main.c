@@ -89,21 +89,26 @@ main(int argc, char *argv[])
 			errx(1, "unable to get date and time");
 		if (memory_query(&mem_usage, meminfo) == -1)
 			errx(1, "unable to get RAM usage");
-		if (BATTERY_EXISTS(batt)) {
-			if (battery_query(batt, &bi) == -1)
-				errx(1, "unable to get battery info");
-		}
 
 		snprintf(status_buf, STATUS_LEN, "%d%s%s%s%s",
 		         mem_usage, status_delim,
 		         load_buf,  status_delim,
 		         time_buf);
 
+		if (!BATTERY_EXISTS(batt)) {
+			if (battery_open(batt_path, ac_path, &batt, NULL) == 0)
+				warnx("battery is online");
+		}
 		if (BATTERY_EXISTS(batt)) {
-			off = strlen(status_buf);
-			snprintf(status_buf + off, STATUS_LEN - off, "%s%c%d",
-			         status_delim,
-			         ac_icons[bi.power_state], bi.capacity);
+			if (battery_query(batt, &bi) == 0) {
+				off = strlen(status_buf);
+				snprintf(status_buf + off, STATUS_LEN - off, "%s%c%d",
+				         status_delim,
+				         ac_icons[bi.power_state], bi.capacity);
+			} else {
+				battery_close(&batt);
+				warnx("battery is offline");
+			}
 		}
 
 #ifdef STATUS_ANIMATION
