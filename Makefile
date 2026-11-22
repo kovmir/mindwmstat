@@ -11,6 +11,8 @@ CFLAGS += -pedantic
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -D_DEFAULT_SOURCE
+# generate header dependencies for incremental builds
+DEPFLAGS = -MMD -MP
 
 ifneq ($(GIT_VERSION),)
   CFLAGS += -DGIT_VERSION='"$(GIT_VERSION)"'
@@ -28,40 +30,56 @@ endif
 
 LDLIBS += $(LIB_LDLIBS)
 
-BUILD_BIN := mindwmstat
-CHECK_BIN  := test
-
 PREFIX ?= /usr/local
+
+BUILD_SRCS := src/main.c src/stats.c src/battery.c
+CHECK_SRCS := test/test.c test/stats_test.c test/battery_test.c src/stats.c src/battery.c
+
+BUILD_BIN := build/bin/mindwmstat
+CHECK_BIN := build/bin/test
+
+BUILD_OBJS := $(patsubst src/%.c,build/%.o,$(BUILD_SRCS))
+CHECK_OBJS := $(patsubst src/%.c,build/%.o,$(filter src/%,$(CHECK_SRCS))) \
+              $(patsubst test/%.c,build/%.o,$(filter test/%,$(CHECK_SRCS)))
 
 all: build
 
 build: $(BUILD_BIN)
 
 check: $(CHECK_BIN)
+	./$(CHECK_BIN)
 
-$(BUILD_BIN): LDLIBS += $(X11_LDLIBS)
 $(BUILD_BIN): CFLAGS += $(X11_CFLAGS)
-$(BUILD_BIN): main.o stats.o battery.o
+$(BUILD_BIN): LDLIBS += $(X11_LDLIBS)
+$(BUILD_BIN): $(BUILD_OBJS) | build/bin
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-$(CHECK_BIN): battery_test.o battery.o stats_test.o stats.o test.o
+# test sources include headers from src/
+$(CHECK_BIN): CFLAGS += -Isrc
+$(CHECK_BIN): $(CHECK_OBJS) | build/bin
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-main.o: config.h stats.h battery.h
+build/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(DEPFLAGS) $(LDFLAGS) -c $< -o $@
 
-test.o: stats_test.h battery_test.h
+build/%.o: test/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(DEPFLAGS) $(LDFLAGS) -c $< -o $@
 
-stats.o: stats.h
+build/bin:
+	mkdir -p $@
 
-battery.o: battery.h
-
-install:
-	install -Dm755 ./$(BUILD_BIN) "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
+install: build
+	install -Dm755 $(BUILD_BIN) "$(DESTDIR)$(PREFIX)/bin/$(notdir $(BUILD_BIN))"
 
 uninstall:
-	rm -f "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
+	rm -f "$(DESTDIR)$(PREFIX)/bin/$(notdir $(BUILD_BIN))"
 
 clean:
-	rm -f *.o $(BUILD_BIN) $(CHECK_BIN)
+	rm -rf build
 
-.PHONY: all build install uninstall clean
+-include $(BUILD_OBJS:.o=.d)
+-include $(CHECK_OBJS:.o=.d)
+
+.PHONY: all build check install uninstall clean
