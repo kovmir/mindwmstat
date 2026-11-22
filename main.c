@@ -12,6 +12,7 @@
 #endif /* CONSOLE_OUTPUT */
 
 #include "stats.h"
+#include "battery.h"
 
 #define SUPPORT_URL "https://github.com/kovmir/mindwmstat/issues"
 #ifndef GIT_VERSION

@@ -29,7 +29,7 @@ endif
 LDLIBS += $(LIB_LDLIBS)
 
 BUILD_BIN := mindwmstat
-TEST_BIN  := stats_test
+CHECK_BIN  := test
 
 PREFIX ?= /usr/local
 
@@ -37,19 +37,23 @@ all: build
 
 build: $(BUILD_BIN)
 
-test: $(TEST_BIN)
+check: $(CHECK_BIN)
 
 $(BUILD_BIN): LDLIBS += $(X11_LDLIBS)
 $(BUILD_BIN): CFLAGS += $(X11_CFLAGS)
-$(BUILD_BIN): main.o stats.o
+$(BUILD_BIN): main.o stats.o battery.o
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-$(TEST_BIN): stats_test.o stats.o
+$(CHECK_BIN): battery_test.o battery.o stats_test.o stats.o test.o
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-main.o: config.h stats.h
+main.o: config.h stats.h battery.h
+
+test.o: stats_test.h battery_test.h
 
 stats.o: stats.h
+
+battery.o: battery.h
 
 install:
 	install -Dm755 ./$(BUILD_BIN) "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
@@ -58,6 +62,6 @@ uninstall:
 	rm -f "$(DESTDIR)$(PREFIX)/bin/$(BUILD_BIN)"
 
 clean:
-	rm -f *.o $(BUILD_BIN) $(TEST_BIN)
+	rm -f *.o $(BUILD_BIN) $(CHECK_BIN)
 
-.PHONY: all build test install uninstall clean
+.PHONY: all build install uninstall clean
